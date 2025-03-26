@@ -1,113 +1,123 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { useState, useEffect } from 'react';
+import { GetServerSideProps } from 'next';
+import { Product } from '../types/product';
+import { useCart } from '../contex/CartContext';
+import Link from 'next/link';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+interface HomeProps {
+  products: Product[];
+}
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export default function Home({ products: initialProducts }: HomeProps) {
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const { addToCart } = useCart();
 
-export default function Home() {
+  // Get unique categories
+  const categories = ['all', ...new Set(initialProducts.map(p => p.category))];
+  useEffect(() => {
+    let filtered = initialProducts;
+  
+    if (searchTerm) {
+      filtered = filtered.filter(product =>
+        product.title.toLowerCase().includes(searchTerm.toLowerCase())
+      ); // <-- Closing parenthesis added here
+    }
+  
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(product => 
+        product.category === selectedCategory
+      );
+    }
+  
+    setProducts(filtered);
+  }, [searchTerm, selectedCategory, initialProducts]);
+  
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className="container mx-auto px-6 py-12">
+    {/* Heading */}
+    <h1 className="text-xl font-extrabold text-teal-400  mb-2">
+     Rahat's Task
+    </h1>
+    <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-10">
+      Our Products
+    </h1>
+  
+    {/* Search & Filter Section */}
+    <div className="mb-10 flex flex-col md:flex-row items-center gap-4">
+      <div className="flex-grow relative">
+        <input
+          type="text"
+          placeholder="Search products..."
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+      <div>
+        <select
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
+  
+    {/* No Products Found */}
+    {products.length === 0 ? (
+      <div className="text-center py-12">
+        <p className="text-xl text-gray-600">No products found matching your criteria.</p>
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {products.map((product) => (
+          <div
+            key={product.id}
+            className="bg-white/80 backdrop-blur-lg border border-gray-200 rounded-xl shadow-lg overflow-hidden transition-all hover:scale-105 hover:shadow-2xl duration-300"
+          >
+            <Link href={`/product/${product.id}`}>
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full h-56 object-contain bg-gray-100 p-4"
+              />
+            </Link>
+            <div className="p-4">
+              <Link href={`/product/${product.id}`} className="hover:text-blue-600">
+                <h2 className="text-lg font-semibold mb-2 line-clamp-2">{product.title}</h2>
+              </Link>
+              <p className="text-gray-700 font-medium text-lg mb-2">${product.price.toFixed(2)}</p>
+              <button
+                onClick={() => addToCart(product)}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+  
   );
 }
+
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+  const res = await fetch('https://fakestoreapi.com/products');
+  const products: Product[] = await res.json();
+
+  return {
+    props: {
+      products,
+    },
+  };
+};
