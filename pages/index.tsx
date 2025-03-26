@@ -39,7 +39,7 @@ export default function Home({ products: initialProducts }: HomeProps) {
     <div className="container mx-auto px-6 py-12">
     {/* Heading */}
     <h1 className="text-xl font-extrabold text-teal-400  mb-2">
-     Rahat's Task
+     Rahat Task
     </h1>
     <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-10">
       Our Products
